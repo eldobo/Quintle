@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Board from './components/Board'
 import Keyboard from './components/Keyboard'
 import { getRandomAnswer } from './words'
 import { VALID_WORDS } from './validWords'
 import { evaluateGuess, getLetterStatuses } from './gameLogic'
-import './App.css'
 
 const MAX_GUESSES = 6
 const WORD_LENGTH = 5
@@ -17,10 +16,14 @@ export default function App() {
   const [gameStatus, setGameStatus] = useState('playing') // 'playing' | 'won' | 'lost'
   const [message, setMessage] = useState('')
   const [invalid, setInvalid] = useState(false)
+  const messageTimerRef = useRef(null)
 
   const showMessage = useCallback((msg, duration = 1800) => {
+    clearTimeout(messageTimerRef.current)
     setMessage(msg)
-    if (duration) setTimeout(() => setMessage(''), duration)
+    if (duration) {
+      messageTimerRef.current = setTimeout(() => setMessage(''), duration)
+    }
   }, [])
 
   const triggerInvalid = useCallback(() => {
@@ -72,6 +75,7 @@ export default function App() {
   }, [handleKey])
 
   const handleNewGame = () => {
+    clearTimeout(messageTimerRef.current)
     setTarget(getRandomAnswer())
     setGuesses([])
     setCurrentGuess('')
@@ -84,10 +88,14 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Wordle</h1>
+        <h1>Quintle</h1>
       </header>
 
-      {message && <div className="message">{message}</div>}
+      {message && (
+        <div className={`message${gameStatus !== 'playing' ? ' message--end-game' : ''}`}>
+          {message}
+        </div>
+      )}
 
       <main className="main">
         <Board

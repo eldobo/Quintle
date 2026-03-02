@@ -1,16 +1,57 @@
-# React + Vite
+# Quintle
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Wordle clone built with React. Guess the 5-letter word in 6 tries. Each guess must be a valid
+word. After each guess, tile colors reveal how close you are:
 
-Currently, two official plugins are available:
+- **Green** — correct letter, correct position
+- **Yellow** — correct letter, wrong position
+- **Gray** — letter not in the word
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- Full keyboard support (physical keyboard + on-screen)
+- Correct duplicate-letter handling (two-pass algorithm matching the original Wordle rules)
+- Flip-reveal, pop, and shake animations
+- Responsive layout for mobile and desktop
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the ESLint configuration
+**Requirements:** Node 18+
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+Then open [http://localhost:5173](http://localhost:5173).
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | Run ESLint |
+
+## Tech Stack
+
+- [React 19](https://react.dev)
+- [Vite 7](https://vite.dev)
+- Plain CSS (no UI library)
+
+## Word List
+
+Word lists are generated from public-domain sources:
+
+- **Valid guesses** (`src/validWords.js`, `src/wordlist.txt`) — all 5-letter words from the
+  [ENABLE1 word list](https://github.com/dolph/dictionary) (public domain)
+- **Answer pool** (`src/words.js`) — top-1000 five-letter words by frequency, derived from
+  [Peter Norvig's unigram frequency data](https://norvig.com/ngrams/) (MIT licence, Google corpus)
+
+To regenerate:
+
+```bash
+node scripts/generate-words.mjs
+# optional: node scripts/generate-words.mjs --answers 1200
+```

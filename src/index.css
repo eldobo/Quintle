@@ -182,7 +182,8 @@ body {
   font-size: 0.75rem;
 }
 
-.key:hover        { filter: brightness(1.2); }
+.key:hover         { filter: brightness(1.2); }
+.key:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 .key--correct     { background: var(--correct); }
 .key--present     { background: var(--present); }
 .key--absent      { background: var(--absent); }
@@ -209,15 +210,22 @@ body {
   filter: brightness(1.1);
 }
 
+/* ── End-game message ────────────────────── */
+
+.message--end-game {
+  font-size: 1.125rem;
+  padding: 14px 24px;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
 /* ── Animations ──────────────────────────── */
 
-/* Tile pops when a letter is typed */
 @keyframes pop {
   0%, 100% { transform: scale(1); }
   50%       { transform: scale(1.12); }
 }
 
-/* Tile squishes down and back up to reveal its color */
 @keyframes flip-reveal {
   0%   { transform: scaleY(1); background-color: transparent; border-color: var(--tile-border-tbd); }
   40%  { transform: scaleY(0); background-color: transparent; border-color: var(--tile-border-tbd); }
@@ -225,11 +233,64 @@ body {
   100% { transform: scaleY(1); }
 }
 
-/* Row shakes on invalid word */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20%       { transform: translateX(-6px); }
   40%       { transform: translateX(6px); }
   60%       { transform: translateX(-6px); }
   80%       { transform: translateX(6px); }
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .tile--tbd,
+  .tile--correct,
+  .tile--present,
+  .tile--absent {
+    animation: none;
+  }
+  .board-row--shake {
+    animation: none;
+  }
+}
+
+/* ── Mobile layout ───────────────────────── */
+
+/* Scale keyboard for viewports narrower than 500px.
+   Row 1 has 10 keys × 43px + 9 × 6px gap = 484px — overflows 375px screens. */
+@media (max-width: 480px) {
+  .key {
+    height: 48px;
+    min-width: 32px;
+    font-size: 0.75rem;
+  }
+
+  .key--wide {
+    min-width: 48px;
+  }
+
+  .keyboard-row {
+    gap: 4px;
+  }
+
+  .keyboard {
+    gap: 6px;
+  }
+}
+
+/* Scale tiles for the narrowest screens (≤360px) */
+@media (max-width: 360px) {
+  .tile {
+    width: 52px;
+    height: 52px;
+    font-size: 1.6rem;
+  }
+
+  .board {
+    gap: 4px;
+  }
+
+  .board-row {
+    gap: 4px;
+  }
 }
