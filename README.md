@@ -1,7 +1,7 @@
 # Quintle
 
-A Wordle clone built with React. Guess the 5-letter word in 6 tries. Each guess must be a valid
-word. After each guess, tile colors reveal how close you are:
+A Wordle clone for **web and macOS**. Guess the 5-letter word in 6 tries. Each guess must be a
+valid word. After each guess, tile colors reveal how close you are:
 
 - **Green** — correct letter, correct position
 - **Yellow** — correct letter, wrong position
@@ -19,12 +19,24 @@ word. After each guess, tile colors reveal how close you are:
 
 **Requirements:** Node 18+
 
+### In the browser
+
 ```bash
 npm install
 npm run dev
 ```
 
 Then open [http://localhost:5173](http://localhost:5173).
+
+### As a macOS app
+
+Requires [Rust](https://rustup.rs) in addition to Node 18+.
+
+```bash
+npm install
+npm run tauri dev   # dev mode — opens a native window
+npm run tauri build # produces Quintle.app + .dmg in src-tauri/target/release/bundle/
+```
 
 ## Scripts
 
