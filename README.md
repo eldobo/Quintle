@@ -12,7 +12,8 @@ word. After each guess, tile colors reveal how close you are:
 - Full keyboard support (physical keyboard + on-screen)
 - Correct duplicate-letter handling (two-pass algorithm matching the original Wordle rules)
 - Flip-reveal, pop, and shake animations
-- Responsive layout for mobile and desktop
+- Mobile/desktop layout toggle — icon buttons in the header snap the Tauri window to a
+  canonical size and scale tiles/keys via CSS variables (see [docs/layout.md](docs/layout.md))
 
 ## Getting Started
 
@@ -29,8 +30,11 @@ Then open [http://localhost:5173](http://localhost:5173).
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start the dev server |
+| `npm run dev` | Start the Vite dev server (browser only) |
+| `npm run tauri dev` | Start the Tauri desktop app in dev mode |
 | `npm run build` | Production build |
+| `npm run tauri build` | Build and bundle the desktop app |
+| `npm test` | Run the test suite |
 | `npm run preview` | Preview the production build |
 | `npm run lint` | Run ESLint |
 
@@ -38,6 +42,7 @@ Then open [http://localhost:5173](http://localhost:5173).
 
 - [React 19](https://react.dev)
 - [Vite 7](https://vite.dev)
+- [Tauri 2](https://tauri.app) (desktop shell)
 - Plain CSS (no UI library)
 
 ## Word List

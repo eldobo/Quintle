@@ -12,6 +12,19 @@
   --absent: #3a3a3c;
   --key-bg: #818384;
   --text: #ffffff;
+
+  /* Key min-widths — overridden by .app--desktop */
+  --key-w: 43px;
+  --key-wide-w: 65px;
+
+  /* Proportional-scaling config (unitless).
+     Tiles and keys scale linearly with window height so the game fills the
+     available space at any size — no gaps, no overflow.
+     --tile-scale / --ref-h  =  natural tile px / canonical non-header height */
+  --tile-scale: 62;   /* mobile canonical tile size (px, unitless) */
+  --key-scale:  58;   /* mobile canonical key height (px, unitless) */
+  --ref-h:     670;   /* canonical non-header height = 720 − 50 */
+  --app-max-w: 500px; /* mobile app max-width, used to cap tile width */
 }
 
 body {
@@ -35,6 +48,7 @@ body {
 }
 
 .header {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -49,7 +63,35 @@ body {
   font-weight: 700;
   letter-spacing: 0.2rem;
   text-transform: uppercase;
+  user-select: none;
 }
+
+/* ── View toggle (icon buttons) ─────────── */
+
+.view-toggle {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+}
+
+.view-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--tile-border-empty);
+  transition: color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-btn--active { color: var(--correct); }
+.view-btn:hover:not(.view-btn--active) { color: var(--text); }
+
+/* ── Main / Footer ───────────────────────── */
 
 .main {
   flex: 1;
@@ -67,20 +109,32 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Message toast ───────────────────────── */
+/* ── Message toast + New Game overlay ───────────────────────── */
 
-.message {
+.toast-area {
   position: fixed;
   top: 64px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.toast-area .new-game-btn {
+  pointer-events: auto;
+}
+
+.message {
   background: var(--text);
   color: var(--bg);
   padding: 10px 16px;
   border-radius: 4px;
   font-weight: 700;
   font-size: 0.875rem;
-  z-index: 100;
   pointer-events: none;
   white-space: nowrap;
 }
@@ -105,15 +159,22 @@ body {
 /* ── Tiles ───────────────────────────────── */
 
 .tile {
-  width: 62px;
-  height: 62px;
+  /* Proportional scaling: tile = (tile-scale / ref-h) × available-height.
+     Grows to fill the window in fullscreen; shrinks if the window is too small.
+     Clamped by the app width so the board never overflows horizontally. */
+  --tile-natural: calc(var(--tile-scale) / var(--ref-h) * (100dvh - 50px));
+  --tile-w-max: calc((min(100vw, var(--app-max-w)) - 20px) / 5);
+  --tile-actual: clamp(24px, var(--tile-natural), var(--tile-w-max));
+  width: var(--tile-actual);
+  height: var(--tile-actual);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: max(0.875rem, calc(var(--tile-actual) * 0.5));
   font-weight: 700;
   border: 2px solid var(--tile-border-empty);
   user-select: none;
+  transition: width 150ms ease, height 150ms ease, font-size 150ms ease;
 }
 
 .tile--tbd {
@@ -159,14 +220,15 @@ body {
 }
 
 .key {
-  height: 58px;
-  min-width: 43px;
+  --key-natural: calc(var(--key-scale) / var(--ref-h) * (100dvh - 50px));
+  height: clamp(24px, var(--key-natural), 100px);
+  min-width: var(--key-w);
   padding: 0;
   border: none;
   border-radius: 4px;
   background: var(--key-bg);
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: max(0.65rem, calc(var(--key-natural) * 0.24));
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
@@ -174,12 +236,12 @@ body {
   align-items: center;
   justify-content: center;
   user-select: none;
-  transition: filter 0.1s;
+  transition: filter 0.1s, height 150ms ease;
 }
 
 .key--wide {
-  min-width: 65px;
-  font-size: 0.75rem;
+  min-width: var(--key-wide-w);
+  font-size: max(0.6rem, calc(var(--key-natural) * 0.22));
 }
 
 .key:hover         { filter: brightness(1.2); }
@@ -192,22 +254,27 @@ body {
 
 /* ── New game button ─────────────────────── */
 
+/* Matches the end-game message exactly in size and background so the two
+   overlay elements read as a coherent pair. White on dark is legible against
+   any board state, including green tiles. */
 .new-game-btn {
-  padding: 12px 28px;
-  background: var(--correct);
-  color: white;
+  padding: 14px 24px;
+  background: var(--text);
+  color: var(--bg);
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 6px;
+  font-size: 1.125rem;
   font-weight: 700;
   font-family: inherit;
   letter-spacing: 0.05rem;
   cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   transition: filter 0.1s;
 }
 
 .new-game-btn:hover {
-  filter: brightness(1.1);
+  filter: brightness(0.92);
 }
 
 /* ── End-game message ────────────────────── */
@@ -252,45 +319,35 @@ body {
   .board-row--shake {
     animation: none;
   }
+  .tile, .key {
+    transition: none;
+  }
 }
 
-/* ── Mobile layout ───────────────────────── */
+/* ── Desktop layout ──────────────────────── */
 
-/* Scale keyboard for viewports narrower than 500px.
-   Row 1 has 10 keys × 43px + 9 × 6px gap = 484px — overflows 375px screens. */
+/* Single-column layout, larger tiles and keys via CSS variable overrides */
+.app--desktop {
+  max-width: 700px;
+  --key-w: 52px;
+  --key-wide-w: 80px;
+  --tile-scale: 80;   /* desktop canonical tile size (px, unitless) */
+  --key-scale:  68;   /* desktop canonical key height (px, unitless) */
+  --ref-h:     790;   /* canonical non-header height = 840 − 50 */
+  --app-max-w: 700px;
+}
+
+/* ── Narrow-screen fallbacks ─────────────── */
+
+/* On narrow viewports, reduce key min-width to prevent horizontal overflow.
+   Row 1 = 10 × 43px + 9 × 6px gap = 484px — overflows anything under ~500px.
+   Key height is handled by the proportional-scaling formula above. */
 @media (max-width: 480px) {
-  .key {
-    height: 48px;
-    min-width: 32px;
-    font-size: 0.75rem;
-  }
-
-  .key--wide {
-    min-width: 48px;
-  }
-
-  .keyboard-row {
-    gap: 4px;
-  }
-
-  .keyboard {
-    gap: 6px;
-  }
+  .key       { min-width: 32px; }
+  .key--wide { min-width: 48px; }
+  .keyboard-row { gap: 4px; }
+  .keyboard     { gap: 6px; }
 }
 
-/* Scale tiles for the narrowest screens (≤360px) */
-@media (max-width: 360px) {
-  .tile {
-    width: 52px;
-    height: 52px;
-    font-size: 1.6rem;
-  }
-
-  .board {
-    gap: 4px;
-  }
-
-  .board-row {
-    gap: 4px;
-  }
-}
+/* Tile width is already capped by --tile-w-max = (min(100vw, --app-max-w) - 20) / 5,
+   so no extra tile override is needed for narrow screens. */
